@@ -7,14 +7,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { MessageModule } from 'primeng/message';
-import { SelectModule } from 'primeng/select';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { AuthService } from './auth.service';
 
 @Component({
     selector: 'app-register',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, MessageModule, SelectModule],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator, MessageModule],
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
@@ -38,27 +37,18 @@ import { AuthService } from './auth.service';
                             <p-message severity="error" [text]="errorMessage" styleClass="mb-6 w-full" />
                         }
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="col-span-1">
-                                <label for="firstName" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">First Name</label>
-                                <input pInputText id="firstName" type="text" placeholder="First Name" class="w-full mb-6" [(ngModel)]="firstName" />
-                            </div>
-                            <div class="col-span-1">
-                                <label for="lastName" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Last Name</label>
-                                <input pInputText id="lastName" type="text" placeholder="Last Name" class="w-full mb-6" [(ngModel)]="lastName" />
-                            </div>
+                        <div>
+                            <label for="name" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Full Name</label>
+                            <input pInputText id="name" type="text" placeholder="Your name" class="w-full mb-6" [(ngModel)]="name" />
+
+                            <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                            <input pInputText id="email" type="text" placeholder="Email address" class="w-full mb-6" [(ngModel)]="email" />
+
+                            <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                            <p-password id="password" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-6" [fluid]="true" [feedback]="true"></p-password>
+
+                            <p-button label="Sign Up" icon="pi pi-user-plus" styleClass="w-full" (onClick)="signUp()"></p-button>
                         </div>
-
-                        <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                        <input pInputText id="email" type="text" placeholder="Email address" class="w-full mb-6" [(ngModel)]="email" />
-
-                        <label for="currency" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Default Currency</label>
-                        <p-select [options]="currencies" [(ngModel)]="defaultCurrency" placeholder="Select Currency" class="w-full mb-6" styleClass="w-full"></p-select>
-
-                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <p-password id="password" [(ngModel)]="password" placeholder="Password" [toggleMask]="true" styleClass="mb-6" [fluid]="true" [feedback]="true"></p-password>
-
-                        <p-button label="Sign Up" icon="pi pi-user-plus" styleClass="w-full" (onClick)="signUp()"></p-button>
 
                         <div class="text-center mt-6">
                             <span class="text-muted-color">Already have an account? </span>
@@ -74,40 +64,23 @@ export class Register {
     private authService = inject(AuthService);
     private router = inject(Router);
 
-    firstName: string = '';
-    lastName: string = '';
+    name: string = '';
     email: string = '';
     password: string = '';
-    defaultCurrency: string = 'USD';
     errorMessage: string = '';
-
-    currencies = [
-        { label: 'USD - US Dollar', value: 'USD' },
-        { label: 'EUR - Euro', value: 'EUR' },
-        { label: 'GBP - British Pound', value: 'GBP' },
-        { label: 'INR - Indian Rupee', value: 'INR' },
-        { label: 'JPY - Japanese Yen', value: 'JPY' }
-    ];
 
     signUp(): void {
         this.errorMessage = '';
-        if (!this.firstName || !this.lastName || !this.email || !this.password) {
-            this.errorMessage = 'Please fill in all required fields.';
+        if (!this.name || !this.email || !this.password) {
+            this.errorMessage = 'Please fill in all fields.';
             return;
         }
 
-        this.authService.register({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            email: this.email,
-            password: this.password,
-            defaultCurrency: this.defaultCurrency
-        }).subscribe(success => {
-            if (success) {
-                this.router.navigate(['/dashboard']);
-            } else {
-                this.errorMessage = 'Registration failed. Email might already exist.';
-            }
-        });
+        const success = this.authService.register(this.name, this.email, this.password);
+        if (success) {
+            this.router.navigate(['/dashboard']);
+        } else {
+            this.errorMessage = 'This email is already registered. Please try logging in.';
+        }
     }
 }
