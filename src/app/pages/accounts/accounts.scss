@@ -1,0 +1,161 @@
+/* Accounts Component Styles */
+
+:host ::ng-deep {
+  .card {
+    border-radius: 12px;
+    border: 1px solid var(--surface-border);
+    padding: 1.5rem;
+    background: var(--surface-card);
+  }
+
+  /* Table Styles */
+  p-table {
+    .p-datatable {
+      .p-datatable-thead > tr > th {
+        background: var(--primary-color);
+        color: var(--primary-color-text);
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+      }
+
+      .p-datatable-tbody > tr {
+        border-color: var(--surface-border);
+        
+        &:hover {
+          background-color: var(--surface-hover);
+        }
+
+        td {
+          padding: 1rem;
+          border-color: var(--surface-border);
+        }
+      }
+    }
+  }
+
+  /* Dialog Styles */
+  .p-dialog {
+    .p-dialog-header {
+      background: var(--primary-color);
+      color: var(--primary-color-text);
+      border: none;
+      padding: 1.5rem;
+
+      .p-dialog-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+      }
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--surface-border);
+      text-align: right;
+      gap: 0.5rem;
+    }
+  }
+
+  /* Button Styles */
+  button[pButton] {
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &.p-button-success {
+      background: #10b981;
+      border-color: #10b981;
+
+      &:hover {
+        background: #059669;
+        border-color: #059669;
+      }
+    }
+
+    &.p-button-warning {
+      background: #f59e0b;
+      border-color: #f59e0b;
+
+      &:hover {
+        background: #d97706;
+        border-color: #d97706;
+      }
+    }
+
+    &.p-button-danger {
+      background: #ef4444;
+      border-color: #ef4444;
+
+      &:hover {
+        background: #dc2626;
+        border-color: #dc2626;
+      }
+    }
+  }
+
+  /* Input Styles */
+  .p-inputtext,
+  .p-inputnumber,
+  .p-dropdown,
+  textarea {
+    border-radius: 6px;
+    border: 1px solid var(--surface-border);
+    padding: 0.75rem;
+    background: var(--surface-0);
+    color: var(--text-color);
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &.ng-invalid.ng-touched {
+      border-color: #ef4444;
+    }
+  }
+
+  /* Status Badge */
+  p-tag {
+    .p-tag {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+
+  /* Account Type Badge */
+  .bg-blue-100 {
+    background-color: #dbeafe;
+
+    &.text-blue-800 {
+      color: #1e40af;
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :host ::ng-deep {
+    .card {
+      padding: 1rem;
+
+      .flex {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    p-dialog {
+      .p-dialog {
+        width: 95vw !important;
+      }
+    }
+  }
+}

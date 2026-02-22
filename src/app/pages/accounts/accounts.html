@@ -1,0 +1,195 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Accounts</h2>
+    <p-button type="button" icon="pi pi-plus" label="New Account" 
+              severity="success"
+              (onClick)="openNew()"></p-button>
+  </div>
+
+  <!-- Accounts Table -->
+  <p-table [value]="accounts" 
+           [paginator]="true" 
+           [rows]="10"
+           [globalFilterFields]="['name','currency','status']"
+           responsiveLayout="scroll"
+           [tableStyle]="{ 'min-width': '50rem' }">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name" style="width:20%; min-width:150px">
+          Name <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="accountType" style="width:15%; min-width:120px">
+          Type <p-sortIcon field="accountType"></p-sortIcon>
+        </th>
+        <th pSortableColumn="balance" style="width:15%; min-width:120px">
+          Balance <p-sortIcon field="balance"></p-sortIcon>
+        </th>
+        <th pSortableColumn="currency" style="width:10%; min-width:80px">
+          Currency <p-sortIcon field="currency"></p-sortIcon>
+        </th>
+        <th pSortableColumn="status" style="width:12%; min-width:100px">
+          Status <p-sortIcon field="status"></p-sortIcon>
+        </th>
+        <th style="width:15%; min-width:100px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-account>
+      <tr>
+        <td class="font-semibold">{{ account.name }}</td>
+        <td>
+          <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+            {{ getAccountTypeLabel(account.accountType) }}
+          </span>
+        </td>
+        <td>
+          <span class="font-semibold">{{ account.balance | currency: account.currency }}</span>
+        </td>
+        <td>{{ account.currency }}</td>
+        <td>
+          <p-tag [value]="getAccountStatusLabel(account.status)" 
+                 [severity]="getSeverity(account.status)">
+          </p-tag>
+        </td>
+        <td>
+          <p-button type="button" pRipple
+                    icon="pi pi-pencil" 
+                    [rounded]="true"
+                    [text]="true"
+                    severity="warn"
+                    class="mr-2"
+                    (onClick)="editAccount(account)"
+                    pTooltip="Edit"
+                    tooltipPosition="top">
+          </p-button>
+          <p-button type="button" pRipple
+                    icon="pi pi-trash" 
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    (onClick)="deleteAccount(account)"
+                    pTooltip="Delete"
+                    tooltipPosition="top">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center py-8">
+          <p class="text-gray-500">No accounts found. Create one to get started!</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Add/Edit Account Dialog -->
+<p-dialog [(visible)]="displayDialog" 
+          [header]="isEditMode ? 'Edit Account' : 'New Account'"
+          [modal]="true"
+          [style]="{ width: '50vw' }"
+          [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+          (onHide)="hideDialog()">
+  
+  <form [formGroup]="form">
+    <div class="grid grid-cols-1 gap-6 mb-6">
+      
+      <!-- Account Name -->
+      <div>
+        <label for="name" class="block text-sm font-medium mb-2">Account Name *</label>
+        <input pInputText type="text" 
+               id="name"
+               formControlName="name"
+               placeholder="Enter account name"
+               class="w-full"
+               [ngClass]="{'ng-invalid ng-touched': form.get('name')?.invalid && form.get('name')?.touched}" />
+        <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+          <span *ngIf="form.get('name')?.hasError('required')">Account name is required</span>
+          <span *ngIf="form.get('name')?.hasError('minlength')">Minimum 3 characters required</span>
+        </small>
+      </div>
+
+      <!-- Account Type -->
+      <div>
+        <label for="accountType" class="block text-sm font-medium mb-2">Account Type *</label>
+        <p-select [options]="accountTypeOptions" 
+                  formControlName="accountType"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select account type"
+                  class="w-full">
+        </p-select>
+      </div>
+
+      <!-- Balance -->
+      <div>
+        <label for="balance" class="block text-sm font-medium mb-2">Balance *</label>
+        <p-inputNumber id="balance"
+                       formControlName="balance"
+                       [useGrouping]="true"
+                       mode="currency"
+                       currency="USD"
+                       placeholder="Enter balance"
+                       class="w-full">
+        </p-inputNumber>
+        <small class="text-red-500" *ngIf="form.get('balance')?.invalid && form.get('balance')?.touched">
+          <span *ngIf="form.get('balance')?.hasError('required')">Balance is required</span>
+          <span *ngIf="form.get('balance')?.hasError('min')">Balance cannot be negative</span>
+        </small>
+      </div>
+
+      <!-- Currency -->
+      <div>
+        <label for="currency" class="block text-sm font-medium mb-2">Currency *</label>
+        <input pInputText type="text" 
+               id="currency"
+               formControlName="currency"
+               placeholder="e.g., USD, EUR, GBP"
+               maxlength="3"
+               class="w-full" />
+        <small class="text-red-500" *ngIf="form.get('currency')?.invalid && form.get('currency')?.touched">
+          Currency is required
+        </small>
+      </div>
+
+      <!-- Account Status -->
+      <div>
+        <label for="status" class="block text-sm font-medium mb-2">Status *</label>
+        <p-select [options]="accountStatusOptions" 
+                  formControlName="status"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select status"
+                  class="w-full">
+        </p-select>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label for="description" class="block text-sm font-medium mb-2">Description</label>
+        <textarea pInputTextarea 
+                  id="description"
+                  formControlName="description"
+                  placeholder="Enter account description"
+                  rows="4"
+                  class="w-full"></textarea>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button type="button" label="Cancel" 
+              severity="secondary"
+              (onClick)="hideDialog()"></p-button>
+    <p-button type="button" 
+              [label]="isEditMode ? 'Update' : 'Create'"
+              (onClick)="saveAccount()"></p-button>
+  </ng-template>
+</p-dialog>
